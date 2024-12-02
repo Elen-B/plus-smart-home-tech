@@ -27,7 +27,7 @@ protocol SensorEventProtocol {
         int temperature_f;
     }
 
-    record TemperatureSensorAvro {
+    record SensorEventAvro {
         string id;
         string hubId;
         timestamp_ms timestamp;
