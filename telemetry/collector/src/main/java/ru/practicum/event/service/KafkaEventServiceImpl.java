@@ -2,7 +2,13 @@ package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Service;
+import ru.practicum.config.KafkaConfig;
+import ru.practicum.event.mapper.HubEventMapper;
+import ru.practicum.event.mapper.SensorEventMapper;
 import ru.practicum.event.model.hub.HubEvent;
 import ru.practicum.event.model.sensor.SensorEvent;
 
@@ -10,13 +16,20 @@ import ru.practicum.event.model.sensor.SensorEvent;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaEventServiceImpl implements EventService {
+    private final Producer<String, SpecificRecordBase> producer;
+
     @Override
     public void collectSensorEvent(SensorEvent sensorEvent) {
-
+        send(KafkaConfig.SENSOR_EVENTS_TOPIC, SensorEventMapper.toSensorEventAvro(sensorEvent));
     }
 
     @Override
     public void collectHubEvent(HubEvent hubEvent) {
+        send(KafkaConfig.HUB_EVENTS_TOPIC, HubEventMapper.toHubEventAvro(hubEvent));
+    }
 
+    private void send(String topic, SpecificRecordBase specificRecordBase) {
+        ProducerRecord<String, SpecificRecordBase> rec = new ProducerRecord<>(topic, specificRecordBase);
+        producer.send(rec);
     }
 }
