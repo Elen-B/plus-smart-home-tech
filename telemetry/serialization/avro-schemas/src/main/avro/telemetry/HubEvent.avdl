@@ -66,7 +66,6 @@ protocol HubEventProtocol {
     record HubEventAvro {
         string hub_id;
         timestamp_ms timestamp;
-        ConditionOperationAvro operation;
         union {
                 DeviceAddedEventAvro,
                 DeviceRemovedEventAvro,
