@@ -20,16 +20,27 @@ public class KafkaEventServiceImpl implements EventService {
 
     @Override
     public void collectSensorEvent(SensorEvent sensorEvent) {
-        send(KafkaConfig.SENSOR_EVENTS_TOPIC, SensorEventMapper.toSensorEventAvro(sensorEvent));
+        send(KafkaConfig.SENSOR_EVENTS_TOPIC,
+                sensorEvent.getHubId(),
+                sensorEvent.getTimestamp().toEpochMilli(),
+                SensorEventMapper.toSensorEventAvro(sensorEvent));
     }
 
     @Override
     public void collectHubEvent(HubEvent hubEvent) {
-        send(KafkaConfig.HUB_EVENTS_TOPIC, HubEventMapper.toHubEventAvro(hubEvent));
+        send(KafkaConfig.HUB_EVENTS_TOPIC,
+                hubEvent.getHubId(),
+                hubEvent.getTimestamp().toEpochMilli(),
+                HubEventMapper.toHubEventAvro(hubEvent));
     }
 
-    private void send(String topic, SpecificRecordBase specificRecordBase) {
-        ProducerRecord<String, SpecificRecordBase> rec = new ProducerRecord<>(topic, specificRecordBase);
+    private void send(String topic, String key, Long timestamp, SpecificRecordBase specificRecordBase) {
+        ProducerRecord<String, SpecificRecordBase> rec = new ProducerRecord<>(
+                topic,
+                null,
+                timestamp,
+                key,
+                specificRecordBase);
         producer.send(rec);
     }
 }
