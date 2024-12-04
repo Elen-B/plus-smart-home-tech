@@ -17,10 +17,11 @@ import ru.practicum.event.model.sensor.SensorEvent;
 @Slf4j
 public class KafkaEventServiceImpl implements EventService {
     private final Producer<String, SpecificRecordBase> producer;
+    private final KafkaConfig kafkaConfig;
 
     @Override
     public void collectSensorEvent(SensorEvent sensorEvent) {
-        send(KafkaConfig.SENSOR_EVENTS_TOPIC,
+        send(kafkaConfig.getKafkaProperties().getSensorEventsTopic(),
                 sensorEvent.getHubId(),
                 sensorEvent.getTimestamp().toEpochMilli(),
                 SensorEventMapper.toSensorEventAvro(sensorEvent));
@@ -28,7 +29,7 @@ public class KafkaEventServiceImpl implements EventService {
 
     @Override
     public void collectHubEvent(HubEvent hubEvent) {
-        send(KafkaConfig.HUB_EVENTS_TOPIC,
+        send(kafkaConfig.getKafkaProperties().getHubEventsTopic(),
                 hubEvent.getHubId(),
                 hubEvent.getTimestamp().toEpochMilli(),
                 HubEventMapper.toHubEventAvro(hubEvent));
