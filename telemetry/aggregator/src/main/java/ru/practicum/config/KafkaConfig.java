@@ -35,7 +35,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaConsumer<String, SensorEventAvro> getKafkaConsumer() {
+    public KafkaConsumer<String, SensorEventAvro> consumer() {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getConsumerGroupId());
