@@ -10,6 +10,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.practicum.config.KafkaConfig;
+import ru.practicum.service.HubEventService;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
 import java.time.Duration;
@@ -24,6 +25,8 @@ public class HubEventProcessor implements Runnable {
     private final Consumer<String, HubEventAvro> consumer;
     private final KafkaConfig kafkaConfig;
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+    private final HubEventService service;
+
     @Override
     public void run() {
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
@@ -54,13 +57,13 @@ public class HubEventProcessor implements Runnable {
             } finally {
                 log.info("Закрываем консьюмер");
                 consumer.close();
-                log.info("Закрываем продюсер");
-                //snapshotService.close();
             }
         }
     }
 
     private void handleRecord(ConsumerRecord<String, HubEventAvro> consumerRecord) throws InterruptedException {
+        log.info("handleRecord {}", consumerRecord);
+        service.process(consumerRecord.value());
         //Optional<SensorsSnapshotAvro> snapshotAvro = snapshotService.updateState(consumerRecord.value());
         //snapshotAvro.ifPresent(snapshotService::collectSensorSnapshot);
     }
