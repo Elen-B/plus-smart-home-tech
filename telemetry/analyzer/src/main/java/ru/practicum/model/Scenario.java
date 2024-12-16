@@ -28,6 +28,7 @@ public class Scenario {
             inverseJoinColumns = @JoinColumn(name = "condition_id")
     )
     List<Condition> conditions;
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "scenario_actions",

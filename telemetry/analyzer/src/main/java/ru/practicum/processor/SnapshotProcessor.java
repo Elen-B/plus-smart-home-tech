@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.config.KafkaConfig;
 import ru.practicum.model.Scenario;
 import ru.practicum.service.AnalyzerService;
+import ru.practicum.service.HubEventService;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.time.Duration;
@@ -27,6 +28,8 @@ public class SnapshotProcessor implements Runnable {
     private final KafkaConfig kafkaConfig;
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
     private final AnalyzerService analyzerService;
+    private final HubEventService hubEventService;
+
 
     @Override
     public void run() {
@@ -58,8 +61,6 @@ public class SnapshotProcessor implements Runnable {
             } finally {
                 log.info("Закрываем консьюмер");
                 consumer.close();
-                log.info("Закрываем продюсер");
-                //snapshotService.close();
             }
         }
     }
@@ -68,6 +69,9 @@ public class SnapshotProcessor implements Runnable {
         log.info("analyzer handleRecord {}", consumerRecord.value());
         List<Scenario> scenarios = analyzerService.getScenariosBySnapshot(consumerRecord.value());
         log.info("==> found scenarios for execute {}", scenarios.size());
+        for (Scenario scenario: scenarios) {
+            hubEventService.sendActionsByScenario(scenario);
+        }
     }
 
     private void manageOffsets(ConsumerRecord<String, SensorsSnapshotAvro> consumerRecord,
@@ -78,9 +82,9 @@ public class SnapshotProcessor implements Runnable {
                 new OffsetAndMetadata(consumerRecord.offset() + 1)
         );
 
-        if(count % 10 == 0) {
+        if (count % 10 == 0) {
             consumer.commitAsync(currentOffsets, (offsets, exception) -> {
-                if(exception != null) {
+                if (exception != null) {
                     log.warn("Ошибка во время фиксации оффсетов: {}", offsets, exception);
                 }
             });

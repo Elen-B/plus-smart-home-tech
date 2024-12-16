@@ -3,6 +3,8 @@ package ru.practicum.mapper;
 import ru.practicum.model.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
+import java.util.List;
+
 public class Mapper {
 
     public static Sensor mapToSensor(HubEventAvro hubEventAvro, DeviceAddedEventAvro deviceAddedEventAvro) {
@@ -13,36 +15,35 @@ public class Mapper {
     }
 
     public static Scenario mapToScenario(HubEventAvro hubEventAvro, ScenarioAddedEventAvro scenarioAddedEventAvro) {
-        return new Scenario(
-                null,
-                hubEventAvro.getHubId(),
-                scenarioAddedEventAvro.getName(),
-                scenarioAddedEventAvro.getConditions().stream()
-                        .map(conditionAvro -> mapToCondition(hubEventAvro, conditionAvro))
-                        .toList(),
-                scenarioAddedEventAvro.getActions().stream()
-                        .map(actionAvro -> mapToAction(hubEventAvro, actionAvro))
-                        .toList()
-        );
+        Scenario scenario = new Scenario();
+        scenario.setHubId(hubEventAvro.getHubId());
+        scenario.setName(scenarioAddedEventAvro.getName());
+        scenario.setConditions(scenarioAddedEventAvro.getConditions().stream()
+                .map(conditionAvro -> mapToCondition(scenario, conditionAvro))
+                .toList());
+        scenario.setActions(scenarioAddedEventAvro.getActions().stream()
+                .map(actionAvro -> mapToAction(scenario, actionAvro))
+                .toList());
+
+        return scenario;
     }
 
-    public static Condition mapToCondition(HubEventAvro hubEventAvro, ScenarioConditionAvro conditionAvro) {
+    public static Condition mapToCondition(Scenario scenario, ScenarioConditionAvro conditionAvro) {
         return Condition.builder()
-                .sensor(new Sensor(conditionAvro.getSensorId(), hubEventAvro.getHubId()))
+                .sensor(new Sensor(conditionAvro.getSensorId(), scenario.getHubId()))
                 .type(toConditionType(conditionAvro.getType()))
                 .operation(toConditionOperation(conditionAvro.getOperation()))
                 .value(getConditionValue(conditionAvro.getValue()))
+                .scenarios(List.of(scenario))
                 .build();
     }
 
-    public static Action mapToAction(HubEventAvro hubEventAvro, DeviceActionAvro deviceActionAvro) {
-        Action action = Action.builder()
-                .sensor(new Sensor(deviceActionAvro.getSensorId(), hubEventAvro.getHubId()))
+    public static Action mapToAction(Scenario scenario, DeviceActionAvro deviceActionAvro) {
+        return Action.builder()
+                .sensor(new Sensor(deviceActionAvro.getSensorId(), scenario.getHubId()))
                 .type(toActionType(deviceActionAvro.getType()))
                 .value(deviceActionAvro.getValue())
                 .build();
-        System.out.println("action = " + action);
-        return action;
     }
 
     public static ConditionType toConditionType(ConditionTypeAvro conditionTypeAvro) {

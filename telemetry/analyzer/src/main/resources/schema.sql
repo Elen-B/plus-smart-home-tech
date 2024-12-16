@@ -1,7 +1,3 @@
-drop table scenario_conditions;
-drop table scenario_actions;
-drop table actions;
-drop table conditions;
 -- создаём таблицу scenarios
 CREATE TABLE IF NOT EXISTS scenarios (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

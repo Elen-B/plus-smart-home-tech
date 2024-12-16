@@ -24,6 +24,6 @@ public class Action {
     @Enumerated(EnumType.STRING)
     ActionType type;
     Integer value;
-    @ManyToMany(mappedBy = "actions", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "actions")
     private List<Scenario> scenarios;
 }

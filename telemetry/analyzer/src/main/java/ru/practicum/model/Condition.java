@@ -26,6 +26,6 @@ public class Condition {
     @Enumerated(EnumType.STRING)
     ConditionOperation operation;
     Integer value;
-    @ManyToMany(mappedBy = "conditions", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "conditions")
     private List<Scenario> scenarios;
 }
