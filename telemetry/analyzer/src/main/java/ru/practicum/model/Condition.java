@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Table(name = "conditions")
 @Getter
@@ -24,4 +26,6 @@ public class Condition {
     @Enumerated(EnumType.STRING)
     ConditionOperation operation;
     Integer value;
+    @ManyToMany(mappedBy = "conditions", cascade = CascadeType.ALL)
+    private List<Scenario> scenarios;
 }

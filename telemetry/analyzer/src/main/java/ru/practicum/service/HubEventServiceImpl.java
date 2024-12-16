@@ -25,7 +25,7 @@ public class HubEventServiceImpl implements HubEventService {
 
     @Override
     public void process(HubEventAvro hubEventAvro) {
-        log.info("start process {}", hubEventAvro);
+        log.info("start process for {}", hubEventAvro);
         String type = hubEventAvro.getPayload().getClass().getName();
         if (hubEventHandlers.containsKey(type)) {
             log.info("process {}", hubEventHandlers.get(type));

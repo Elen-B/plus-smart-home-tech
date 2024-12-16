@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Table(name = "actions")
 @Getter
@@ -22,4 +24,6 @@ public class Action {
     @Enumerated(EnumType.STRING)
     ActionType type;
     Integer value;
+    @ManyToMany(mappedBy = "actions", cascade = CascadeType.ALL)
+    private List<Scenario> scenarios;
 }

@@ -64,8 +64,6 @@ public class HubEventProcessor implements Runnable {
     private void handleRecord(ConsumerRecord<String, HubEventAvro> consumerRecord) throws InterruptedException {
         log.info("handleRecord {}", consumerRecord);
         service.process(consumerRecord.value());
-        //Optional<SensorsSnapshotAvro> snapshotAvro = snapshotService.updateState(consumerRecord.value());
-        //snapshotAvro.ifPresent(snapshotService::collectSensorSnapshot);
     }
 
     private void manageOffsets(ConsumerRecord<String, HubEventAvro> consumerRecord,
