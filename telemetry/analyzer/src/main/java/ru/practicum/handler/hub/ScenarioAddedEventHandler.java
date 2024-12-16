@@ -1,11 +1,10 @@
-package ru.practicum.handler;
+package ru.practicum.handler.hub;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.Scenario;
-import ru.practicum.repository.ActionRepository;
 import ru.practicum.repository.ScenarioRepository;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
@@ -17,7 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ScenarioAddedEventHandler implements HubEventHandler {
     private final ScenarioRepository scenarioRepository;
-    private final ActionRepository actionRepository;
 
     @Override
     public String getType() {

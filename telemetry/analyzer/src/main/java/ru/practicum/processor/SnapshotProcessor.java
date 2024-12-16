@@ -10,6 +10,8 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.practicum.config.KafkaConfig;
+import ru.practicum.model.Scenario;
+import ru.practicum.service.AnalyzerService;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.time.Duration;
@@ -24,6 +26,8 @@ public class SnapshotProcessor implements Runnable {
     private final Consumer<String, SensorsSnapshotAvro> consumer;
     private final KafkaConfig kafkaConfig;
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+    private final AnalyzerService analyzerService;
+
     @Override
     public void run() {
         Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
@@ -62,8 +66,8 @@ public class SnapshotProcessor implements Runnable {
 
     private void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> consumerRecord) throws InterruptedException {
         log.info("analyzer handleRecord {}", consumerRecord.value());
-        //Optional<SensorsSnapshotAvro> snapshotAvro = snapshotService.updateState(consumerRecord.value());
-        //snapshotAvro.ifPresent(snapshotService::collectSensorSnapshot);
+        List<Scenario> scenarios = analyzerService.getScenariosBySnapshot(consumerRecord.value());
+        log.info("==> found scenarios for execute {}", scenarios.size());
     }
 
     private void manageOffsets(ConsumerRecord<String, SensorsSnapshotAvro> consumerRecord,

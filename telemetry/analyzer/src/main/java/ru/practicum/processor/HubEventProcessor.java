@@ -48,7 +48,7 @@ public class HubEventProcessor implements Runnable {
         } catch (WakeupException ignores) {
             // игнорируем - закрываем консьюмер и продюсер в блоке finally
         } catch (Exception e) {
-            log.error("Ошибка во время обработки снимка состояния ", e);
+            log.error("Ошибка во время обработки события хаба ", e);
         } finally {
 
             try {

@@ -2,7 +2,7 @@ package ru.practicum.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.handler.HubEventHandler;
+import ru.practicum.handler.hub.HubEventHandler;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
 import java.util.Map;
