@@ -1,15 +1,12 @@
 package ru.practicum.handler.hub;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.repository.SensorRepository;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
-import java.util.List;
-
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DeviceRemovedEventHandler implements HubEventHandler {
@@ -20,12 +17,10 @@ public class DeviceRemovedEventHandler implements HubEventHandler {
         return DeviceRemovedEventAvro.class.getName();
     }
 
+    @Transactional
     @Override
     public void handle(HubEventAvro hubEventAvro) {
         String sensorId = ((DeviceRemovedEventAvro) hubEventAvro.getPayload()).getId();
-        if (sensorRepository.existsByIdInAndHubId(List.of(sensorId), hubEventAvro.getHubId())) {
-            sensorRepository.deleteById(sensorId);
-            log.info("sensor with id {} deleted", sensorId);
-        }
+        sensorRepository.deleteByIdAndHubId(sensorId, hubEventAvro.getHubId());
     }
 }
