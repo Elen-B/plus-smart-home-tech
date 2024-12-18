@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,5 +26,5 @@ public class Action {
     ActionType type;
     Integer value;
     @ManyToMany(mappedBy = "actions")
-    private List<Scenario> scenarios;
+    List<Scenario> scenarios = new ArrayList<>();
 }
