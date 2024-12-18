@@ -1,7 +1,6 @@
 package ru.practicum.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.handler.sensor.SensorEventHandler;
 import ru.practicum.model.Condition;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class AnalyzerServiceImpl implements AnalyzerService {
-    @Autowired
     private final ScenarioRepository scenarioRepository;
     private final Map<String, SensorEventHandler> sensorEventHandlers ;
 
