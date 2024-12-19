@@ -74,8 +74,8 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
         }
         scenarioRepository.save(scenario);
         log.info("{} scenario {}", logAction, scenario);
-        DeleteUnusedConditions(oldConditionIds);
-        DeleteUnusedActions(oldActionIds);
+        deleteUnusedConditions(oldConditionIds);
+        deleteUnusedActions(oldActionIds);
     }
 
     private List<String> getConditionsSensorIds(Collection<ScenarioConditionAvro> conditionsAvro) {
@@ -90,12 +90,12 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
         return sensorRepository.existsByIdInAndHubId(ids, hubId);
     }
 
-    private void DeleteUnusedConditions(Collection<Long> ids) {
+    private void deleteUnusedConditions(Collection<Long> ids) {
         if (ids != null && !ids.isEmpty())
             conditionRepository.deleteAllById(ids);
     }
 
-    private void DeleteUnusedActions(Collection<Long> ids) {
+    private void deleteUnusedActions(Collection<Long> ids) {
         if (ids != null && !ids.isEmpty())
             actionRepository.deleteAllById(ids);
     }
