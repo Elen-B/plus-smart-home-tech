@@ -41,3 +41,21 @@ services:
       - 8082:8080
     environment:
       DYNAMIC_CONFIG_ENABLED: true
+
+  db:
+    image: postgres:16.1
+    container_name: postgres-analyzer
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=analyzer
+      - POSTGRES_USER=analyzer
+      - POSTGRES_DB=analyzer
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
