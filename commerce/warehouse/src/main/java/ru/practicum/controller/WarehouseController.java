@@ -1,6 +1,7 @@
 package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.client.WarehouseClient;
@@ -18,6 +19,7 @@ public class WarehouseController implements WarehouseClient {
         warehouseService.newProductInWarehouse(request);
     }
 
+    @PostMapping("/check")
     @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
         return warehouseService.checkProductQuantityEnoughForShoppingCart(shoppingCartDto);

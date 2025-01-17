@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import jakarta.validation.constraints.NotNull;
+import ru.practicum.dto.BookedProductsDto;
 import ru.practicum.dto.ChangeProductQuantityRequest;
 import ru.practicum.dto.ShoppingCartDto;
 
@@ -17,6 +18,8 @@ public interface ShoppingCartService {
     ShoppingCartDto removeFromShoppingCart(String userName, List<UUID> products);
 
     ShoppingCartDto changeProductQuantity(String userName, ChangeProductQuantityRequest request);
+
+    BookedProductsDto bookingProductsFromShoppingCart(String userName);
 
     void deleteShoppingCart(String userName);
 }

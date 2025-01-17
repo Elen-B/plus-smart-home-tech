@@ -1,9 +1,11 @@
 package ru.practicum.service;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.WarehouseClient;
+import ru.practicum.dto.BookedProductsDto;
 import ru.practicum.dto.ChangeProductQuantityRequest;
 import ru.practicum.dto.ShoppingCartDto;
 import ru.practicum.exception.NoProductsInShoppingCartException;
@@ -18,11 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartMapper shoppingCartMapper;
+    private final WarehouseClient warehouseClient;
 
     @Override
     public ShoppingCartDto getShoppingCart(String userName) {
@@ -32,7 +36,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     @Transactional
-    public ShoppingCartDto addProductsToShoppingCart(String userName, Map<UUID, @NotNull Long> products) {
+    public ShoppingCartDto addProductsToShoppingCart(String userName, Map<UUID, Long> products) {
         checkUser(userName);
         ShoppingCart cart = shoppingCartRepository.findByUserName(userName).orElse(
                 getNewShoppingCart(userName)
@@ -68,6 +72,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         cart.getProducts().put(request.getProductId(), request.getNewQuantity());
         ShoppingCart savedCart = shoppingCartRepository.save(cart);
         return shoppingCartMapper.map(savedCart);
+    }
+
+    @Override
+    @Transactional
+    public BookedProductsDto bookingProductsFromShoppingCart(String userName) {
+        checkUser(userName);
+        ShoppingCartDto cart = shoppingCartMapper.map(getShoppingCartByUsername(userName));
+
+        return warehouseClient.checkProductQuantityEnoughForShoppingCart(cart);
     }
 
     @Override

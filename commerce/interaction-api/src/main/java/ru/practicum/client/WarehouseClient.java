@@ -14,8 +14,8 @@ public interface WarehouseClient {
     @PutMapping
     void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest request);
 
-    @PostMapping("/check")
-    BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody @Valid ShoppingCartDto shoppingCartDto);
+    @PostMapping("/api/v1/warehouse/check")
+    BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody ShoppingCartDto shoppingCartDto);
 
     @PostMapping("/add")
     void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);

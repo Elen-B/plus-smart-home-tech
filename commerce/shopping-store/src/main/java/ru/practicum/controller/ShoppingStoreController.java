@@ -3,7 +3,7 @@ package ru.practicum.controller;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.client.ShoppingStoreOperations;
+import ru.practicum.client.ShoppingStoreClient;
 import ru.practicum.dto.*;
 import ru.practicum.service.ShoppingStoreService;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/shopping-store")
 @RequiredArgsConstructor
-public class ShoppingStoreController implements ShoppingStoreOperations {
+public class ShoppingStoreController implements ShoppingStoreClient {
     private final ShoppingStoreService shoppingStoreService;
 
     @Override

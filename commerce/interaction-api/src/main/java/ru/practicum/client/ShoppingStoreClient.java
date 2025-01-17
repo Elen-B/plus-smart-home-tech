@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @FeignClient(name = "shopping-store")
-public interface ShoppingStoreOperations {
+public interface ShoppingStoreClient {
     @GetMapping
     List<ProductDto> getProducts(@RequestParam(name = "category") @NotNull ProductCategory category,
                                  Pageable pageable);

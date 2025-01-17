@@ -47,6 +47,6 @@ public class ShoppingCartController implements ShoppingCartClient {
 
     @Override
     public BookedProductsDto bookingProductsFromShoppingCart(String userName) {
-        return null;
+        return shoppingCartService.bookingProductsFromShoppingCart(userName);
     }
 }
