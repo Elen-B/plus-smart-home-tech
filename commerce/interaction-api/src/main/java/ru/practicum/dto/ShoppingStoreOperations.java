@@ -1,13 +1,9 @@
-package ru.practicum.controller;
+package ru.practicum.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.Pageable;
-import ru.practicum.dto.ProductCategory;
-import ru.practicum.dto.ProductDto;
-import ru.practicum.dto.SetProductQuantityStateRequest;
 
 import java.util.List;
 import java.util.UUID;
