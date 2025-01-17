@@ -3,6 +3,7 @@ package ru.practicum.controller;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.client.ShoppingStoreOperations;
 import ru.practicum.dto.*;
 import ru.practicum.service.ShoppingStoreService;
 
