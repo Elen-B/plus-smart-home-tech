@@ -25,7 +25,7 @@ public interface ShoppingStoreOperations {
     ProductDto createNewProduct(@RequestBody @Valid ProductDto productDto);
 
     @PostMapping
-    ProductDto updateProduct(@RequestBody ProductDto productDto);
+    ProductDto updateProduct(@RequestBody @Valid ProductDto productDto);
 
     @PostMapping("/removeProductFromStore")
     boolean removeProductFromStore(@RequestBody UUID productId);

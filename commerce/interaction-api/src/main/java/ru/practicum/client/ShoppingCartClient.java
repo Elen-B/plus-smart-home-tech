@@ -1,5 +1,6 @@
 package ru.practicum.client;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -15,23 +16,23 @@ import java.util.UUID;
 public interface ShoppingCartClient {
 
     @GetMapping
-    ShoppingCartDto getShoppingCart(@RequestParam String userName);
+    ShoppingCartDto getShoppingCart(@RequestParam(name = "username") String userName);
 
     @PutMapping
-    ShoppingCartDto addProductsToShoppingCart(@RequestParam String userName,
+    ShoppingCartDto addProductsToShoppingCart(@RequestParam(name = "username") String userName,
                                               @RequestBody Map<UUID, @NotNull Long> products);
 
     @DeleteMapping
-    void deleteShoppingCart(@RequestParam String userName);
+    void deleteShoppingCart(@RequestParam(name = "username") String userName);
 
     @PostMapping("/remove")
-    ShoppingCartDto removeFromShoppingCart(@RequestParam String userName,
+    ShoppingCartDto removeFromShoppingCart(@RequestParam(name = "username") String userName,
                                            @RequestBody List<UUID> products);
 
     @PostMapping("/change-quantity")
-    ShoppingCartDto changeProductQuantity(@RequestParam String userName,
-                                          @RequestBody ChangeProductQuantityRequest request);
+    ShoppingCartDto changeProductQuantity(@RequestParam(name = "username") String userName,
+                                          @RequestBody @Valid ChangeProductQuantityRequest request);
 
     @PostMapping("/booking")
-    BookedProductsDto bookingProductsFromShoppingCart(@RequestParam String userName);
+    BookedProductsDto bookingProductsFromShoppingCart(@RequestParam(name = "username") String userName);
 }

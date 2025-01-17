@@ -38,7 +38,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 getNewShoppingCart(userName)
         );
         Map<UUID, Long> cartProducts = new HashMap<>();
-        if (!cart.getProducts().isEmpty()) {
+        if (cart.getProducts() != null && !cart.getProducts().isEmpty()) {
             cartProducts.putAll(cart.getProducts());
         }
         cartProducts.putAll(products);
