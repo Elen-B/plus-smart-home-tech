@@ -1,5 +1,6 @@
 package ru.practicum.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,6 +41,20 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNoProductsInShoppingCartException(final NoProductsInShoppingCartException e) {
+        return new ErrorResponse(
+                e.getCause(),
+                e.getStackTrace(),
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                e.getMessage(),
+                e.getSuppressed(),
+                e.getLocalizedMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
         return new ErrorResponse(
                 e.getCause(),
                 e.getStackTrace(),

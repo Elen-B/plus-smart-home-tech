@@ -9,7 +9,6 @@ import ru.practicum.dto.BookedProductsDto;
 import ru.practicum.dto.ChangeProductQuantityRequest;
 import ru.practicum.dto.ShoppingCartDto;
 import ru.practicum.exception.NoProductsInShoppingCartException;
-import ru.practicum.exception.NotAuthorizedUserException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.ShoppingCartMapper;
 import ru.practicum.model.ShoppingCart;
@@ -30,14 +29,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartDto getShoppingCart(String userName) {
-        checkUser(userName);
         return shoppingCartMapper.map(getShoppingCartByUsername(userName));
     }
 
     @Override
     @Transactional
     public ShoppingCartDto addProductsToShoppingCart(String userName, Map<UUID, Long> products) {
-        checkUser(userName);
         ShoppingCart cart = shoppingCartRepository.findByUserName(userName).orElse(
                 getNewShoppingCart(userName)
         );
@@ -54,7 +51,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public ShoppingCartDto removeFromShoppingCart(String userName, List<UUID> products) {
-        checkUser(userName);
         ShoppingCart cart = getShoppingCartByUsername(userName);
         products.forEach(productId -> cart.getProducts().remove(productId));
         ShoppingCart savedCart = shoppingCartRepository.save(cart);
@@ -64,7 +60,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public ShoppingCartDto changeProductQuantity(String userName, ChangeProductQuantityRequest request) {
-        checkUser(userName);
         ShoppingCart cart = getShoppingCartByUsername(userName);
         if (!cart.getProducts().containsKey(request.getProductId())) {
             throw new NoProductsInShoppingCartException("Нет искомых товаров в корзине");
@@ -77,7 +72,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public BookedProductsDto bookingProductsFromShoppingCart(String userName) {
-        checkUser(userName);
         ShoppingCartDto cart = shoppingCartMapper.map(getShoppingCartByUsername(userName));
 
         return warehouseClient.checkProductQuantityEnoughForShoppingCart(cart);
@@ -86,14 +80,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public void deleteShoppingCart(String userName) {
-        checkUser(userName);
         shoppingCartRepository.deleteByUserName(userName);
-    }
-
-    private void checkUser(String userName) {
-        if (userName.isBlank()) {
-            throw new NotAuthorizedUserException("Имя пользователя не должно быть пустым");
-        }
     }
 
     private ShoppingCart getShoppingCartByUsername(String userName) {
