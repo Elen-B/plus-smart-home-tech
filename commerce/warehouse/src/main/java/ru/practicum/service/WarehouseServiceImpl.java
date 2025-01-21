@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.*;
@@ -18,6 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
@@ -46,6 +48,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     @Transactional
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
+        log.info("Новый запрос на бронирование");
         Map<UUID, Integer> cartProducts = shoppingCartDto.getProducts();
         Map<UUID, WarehouseProduct> products = warehouseRepository.findAllById(cartProducts.keySet())
                 .stream()
