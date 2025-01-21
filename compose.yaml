@@ -59,3 +59,22 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  store-db:
+    image: postgres:16.1
+    container_name: postgres-commerce
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "6432:5432"
+    environment:
+      - POSTGRES_PASSWORD=commerce
+      - POSTGRES_USER=commerce
+ #     - POSTGRES_DB=store
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
