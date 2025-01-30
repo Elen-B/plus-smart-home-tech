@@ -9,6 +9,7 @@ import ru.practicum.dto.ProductCategory;
 import ru.practicum.dto.ProductDto;
 import ru.practicum.dto.SetProductQuantityStateRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,4 +33,7 @@ public interface ShoppingStoreClient {
 
     @PostMapping("/quantityState")
     boolean setProductQuantityState(SetProductQuantityStateRequest request);
+
+    @GetMapping("/onlyIds")
+    List<ProductDto> getProductByIds(Collection<UUID> ids);
 }

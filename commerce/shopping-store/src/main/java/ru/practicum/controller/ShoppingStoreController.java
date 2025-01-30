@@ -7,6 +7,7 @@ import ru.practicum.client.ShoppingStoreClient;
 import ru.practicum.dto.*;
 import ru.practicum.service.ShoppingStoreService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,5 +46,11 @@ public class ShoppingStoreController implements ShoppingStoreClient {
     @Override
     public boolean setProductQuantityState(SetProductQuantityStateRequest request) {
         return shoppingStoreService.setQuantityState(request);
+    }
+
+    @Override
+    @GetMapping("/onlyIds")
+    public List<ProductDto> getProductByIds(Collection<UUID> ids) {
+        return shoppingStoreService.getProductByIds(ids);
     }
 }

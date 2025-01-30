@@ -34,6 +34,7 @@ public class Order {
     UUID paymentId;
     @Column(name = "delivery_id")
     UUID deliveryId;
+    @Enumerated(value = EnumType.STRING)
     OrderState state;
     @Column(name = "delivery_weight")
     Double deliveryWeight;

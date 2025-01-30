@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.ShoppingCartClient;
 import ru.practicum.dto.CreateNewOrderRequest;
 import ru.practicum.dto.OrderDto;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDto createNewOrder(CreateNewOrderRequest request) {
         Order order = getNewOrderFromRequest(request);
         log.info("new order from request: {}", order);
@@ -44,16 +46,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDto returnProducts(ProductReturnRequest request) {
         return null;
     }
 
     @Override
+    @Transactional
     public OrderDto payOrder(UUID orderId) {
         return null;
     }
 
     @Override
+    @Transactional
     public OrderDto failPayOrder(UUID orderId) {
         return null;
     }
@@ -64,11 +69,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDto failDeliverOrder(UUID orderId) {
         return null;
     }
 
     @Override
+    @Transactional
     public OrderDto completeOrder(UUID orderId) {
         return null;
     }
@@ -79,21 +86,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDto calculateDeliveryPrice(UUID orderId) {
         return null;
     }
 
     @Override
+    @Transactional
     public OrderDto assemblyOrder(UUID orderId) {
         return null;
     }
 
     @Override
+    @Transactional
     public OrderDto failAssemblyOrder(UUID orderId) {
         return null;
     }
 
-    private Order getOrderByUsername(String userName) {
+    private Order getOrderByUserName(String userName) {
         return orderRepository.findByUserName(userName).orElseThrow(
                 () -> new NotFoundException("Заказ покупателя не найден")
         );
