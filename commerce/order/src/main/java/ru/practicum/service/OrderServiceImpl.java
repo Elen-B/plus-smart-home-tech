@@ -54,30 +54,30 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto payOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.PAID));
     }
 
     @Override
     @Transactional
     public OrderDto failPayOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.PAYMENT_FAILED));
     }
 
     @Override
     public OrderDto deliverOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.DELIVERED));
     }
 
     @Override
     @Transactional
     public OrderDto failDeliverOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.DELIVERY_FAILED));
     }
 
     @Override
     @Transactional
     public OrderDto completeOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.COMPLETED));
     }
 
     @Override
@@ -94,17 +94,34 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto assemblyOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.ASSEMBLED));
     }
 
     @Override
     @Transactional
     public OrderDto failAssemblyOrder(UUID orderId) {
-        return null;
+        return orderMapper.map(updateOrderState(orderId, OrderState.ASSEMBLY_FAILED));
+    }
+
+    @Override
+    public OrderDto getOrderById(UUID orderId) {
+        return orderMapper.map(findOrderById(orderId));
+    }
+
+    private Order updateOrderState(UUID orderId, OrderState newState) {
+        Order order = findOrderById(orderId);
+        order.setState(newState);
+        return orderRepository.save(order);
     }
 
     private Order getOrderByUserName(String userName) {
         return orderRepository.findByUserName(userName).orElseThrow(
+                () -> new NotFoundException("Заказ покупателя не найден")
+        );
+    }
+
+    private Order findOrderById(UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(
                 () -> new NotFoundException("Заказ покупателя не найден")
         );
     }

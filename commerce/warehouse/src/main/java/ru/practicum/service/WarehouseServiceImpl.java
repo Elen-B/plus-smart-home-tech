@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.*;
 import ru.practicum.exception.NoSpecifiedProductInWarehouseException;
+import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.practicum.mapper.WarehouseMapper;
+import ru.practicum.model.Booking;
 import ru.practicum.model.WarehouseProduct;
+import ru.practicum.repository.BookingRepository;
 import ru.practicum.repository.WarehouseRepository;
 import ru.practicum.utils.AddressUtil;
 
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
+    private final BookingRepository bookingRepository;
     private final WarehouseMapper warehouseMapper;
 
     @Override
@@ -89,9 +93,32 @@ public class WarehouseServiceImpl implements WarehouseService {
         );
     }
 
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        Booking booking = getBookingById(request.getOrderId());
+        booking.setDeliveryId(request.getDeliveryID());
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Integer> products) {
+
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        return null;
+    }
+
     private WarehouseProduct getWarehouseProduct(UUID productId) {
         return warehouseRepository.findById(productId).orElseThrow(
                 () -> new NoSpecifiedProductInWarehouseException("Нет информации о товаре на складе")
+        );
+    }
+
+    private Booking getBookingById(UUID orderId) {
+        return bookingRepository.findById(orderId).orElseThrow(
+                () -> new NotFoundException("Нет информации о бронировании товаров по заказу")
         );
     }
 }

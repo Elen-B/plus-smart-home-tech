@@ -32,4 +32,6 @@ public interface OrderService {
     OrderDto assemblyOrder(UUID orderId);
 
     OrderDto failAssemblyOrder(UUID orderId);
+
+    OrderDto getOrderById(UUID orderId);
 }

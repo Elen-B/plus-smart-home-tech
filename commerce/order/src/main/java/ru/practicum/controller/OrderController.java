@@ -90,4 +90,10 @@ public class OrderController implements OrderClient {
     public OrderDto failAssemblyOrder(UUID orderId) {
         return orderService.failAssemblyOrder(orderId);
     }
+
+    @Override
+    @GetMapping("/{orderId}")
+    public OrderDto getOrder(@PathVariable(name = "orderId") UUID orderId) {
+        return orderService.getOrderById(orderId);
+    }
 }
