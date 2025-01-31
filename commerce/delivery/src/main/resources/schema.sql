@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS delivery;
 CREATE TABLE IF NOT EXISTS address (
     address_id       UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     country          varchar(20) NOT NULL,

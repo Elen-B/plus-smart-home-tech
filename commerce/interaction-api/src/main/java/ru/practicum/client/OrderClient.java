@@ -32,6 +32,9 @@ public interface OrderClient {
     @PostMapping("/api/v1/order/payment/failed")
     OrderDto failPayOrder(@RequestBody @NotNull UUID orderId);
 
+    @PostMapping("/api/v1/order/payment/success")
+    OrderDto successPayOrder(@RequestBody @NotNull UUID orderId);
+
     @PostMapping("/api/v1/order/delivery")
     OrderDto deliverOrder(@RequestBody @NotNull UUID orderId);
 
@@ -53,6 +56,6 @@ public interface OrderClient {
     @PostMapping("/api/v1/order/assembly/failed")
     OrderDto failAssemblyOrder(@RequestBody @NotNull UUID orderId);
 
-    @GetMapping("/api/v1/order/{orderId}")
-    OrderDto getOrder(@PathVariable(name = "orderId") UUID orderId);
+    @GetMapping("/api/v1/order/only")
+    OrderDto getOrder(@RequestBody @NotNull UUID orderId);
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.OrderClient;
 import ru.practicum.client.ShoppingStoreClient;
 import ru.practicum.dto.OrderDto;
 import ru.practicum.dto.PaymentDto;
@@ -29,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
 
     private final ShoppingStoreClient shoppingStoreClient;
+    private final OrderClient orderClient;
 
     @Override
     @Transactional
@@ -46,6 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void paymentSuccess(UUID orderId) {
         updatePaymentState(orderId, PaymentState.SUCCESS);
+        orderClient.successPayOrder(orderId);
     }
 
     @Override
@@ -57,6 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void paymentFailed(UUID orderId) {
         updatePaymentState(orderId, PaymentState.FAILED);
+        orderClient.failPayOrder(orderId);
     }
 
     private Payment updatePaymentState(UUID orderId, PaymentState newState) {
@@ -84,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private double calcTotalCost(OrderDto order) {
         double productCost = calcProductsCost(order);
-        double deliveryCost = 0D;
+        double deliveryCost = order.getDeliveryPrice();
 
         return productCost + calcFeeCost(productCost) + deliveryCost;
     }

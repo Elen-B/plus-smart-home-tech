@@ -16,6 +16,7 @@ import ru.practicum.repository.BookingRepository;
 import ru.practicum.repository.WarehouseRepository;
 import ru.practicum.utils.AddressUtil;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -54,12 +55,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
         log.info("Новый запрос на бронирование");
         Map<UUID, Integer> cartProducts = shoppingCartDto.getProducts();
-        Map<UUID, WarehouseProduct> products = warehouseRepository.findAllById(cartProducts.keySet())
-                .stream()
-                .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
-        if (products.size() != cartProducts.size()) {
-            throw new ProductInShoppingCartLowQuantityInWarehouse("Некоторых товаров нет на складе");
-        }
+        Map<UUID, WarehouseProduct> products = getWarehouseProducts(cartProducts.keySet());
+
         double weight = 0;
         double volume = 0;
         boolean fragile = false;
@@ -94,6 +91,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public void shippedToDelivery(ShippedToDeliveryRequest request) {
         Booking booking = getBookingById(request.getOrderId());
         booking.setDeliveryId(request.getDeliveryID());
@@ -101,13 +99,40 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public void acceptReturn(Map<UUID, Integer> products) {
 
     }
 
     @Override
+    @Transactional
     public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
-        return null;
+        Map<UUID, Integer> orderProducts = request.getProducts();
+        Map<UUID, WarehouseProduct> products = getWarehouseProducts(orderProducts.keySet());
+
+        double weight = 0;
+        double volume = 0;
+        boolean fragile = false;
+        for (Map.Entry<UUID, Integer> cartProduct : orderProducts.entrySet()) {
+            WarehouseProduct product = products.get(cartProduct.getKey());
+            long newQuantity = product.getQuantity() - cartProduct.getValue();
+            if (newQuantity < 0) {
+                throw new ProductInShoppingCartLowQuantityInWarehouse(
+                        "Ошибка, товар из корзины не находится в требуемом количестве на складе");
+            }
+            product.setQuantity(newQuantity);
+            weight += product.getWeight() * cartProduct.getValue();
+            volume += product.getHeight() * product.getWeight() * product.getDepth() * cartProduct.getValue();
+            fragile = fragile || product.isFragile();
+        }
+        addBooking(request);
+        saveWarehouseRemains(products.values());
+
+        return new BookedProductsDto(
+                weight,
+                volume,
+                fragile
+        );
     }
 
     private WarehouseProduct getWarehouseProduct(UUID productId) {
@@ -120,5 +145,28 @@ public class WarehouseServiceImpl implements WarehouseService {
         return bookingRepository.findById(orderId).orElseThrow(
                 () -> new NotFoundException("Нет информации о бронировании товаров по заказу")
         );
+    }
+
+    Map<UUID, WarehouseProduct> getWarehouseProducts(Collection<UUID> ids) {
+        Map<UUID, WarehouseProduct> products = warehouseRepository.findAllById(ids)
+                .stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
+        if (products.size() != ids.size()) {
+            throw new ProductInShoppingCartLowQuantityInWarehouse("Некоторых товаров нет на складе");
+        }
+
+        return products;
+    }
+
+    void addBooking(AssemblyProductsForOrderRequest request) {
+        Booking booking = Booking.builder()
+                .orderId(request.getOrderId())
+                .products(request.getProducts())
+                .build();
+        bookingRepository.save(booking);
+    }
+
+    void saveWarehouseRemains(Collection<WarehouseProduct> products) {
+        warehouseRepository.saveAll(products);
     }
 }

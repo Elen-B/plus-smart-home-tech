@@ -3,6 +3,7 @@ package ru.practicum.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.client.PaymentClient;
@@ -21,31 +22,31 @@ public class PaymentController implements PaymentClient {
 
     @Override
     @PostMapping
-    public PaymentDto createPayment(OrderDto order) {
+    public PaymentDto createPayment(@RequestBody OrderDto order) {
         return paymentService.createPayment(order);
     }
 
     @Override
     @PostMapping("/totalCost")
-    public Double getTotalCost(OrderDto order) {
+    public Double getTotalCost(@RequestBody OrderDto order) {
         return paymentService.getTotalCost(order);
     }
 
     @Override
     @PostMapping("/refund")
-    public void paymentSuccess(UUID orderId) {
+    public void paymentSuccess(@RequestBody UUID orderId) {
         paymentService.paymentSuccess(orderId);
     }
 
     @Override
     @PostMapping("/productCost")
-    public Double getProductCost(OrderDto order) {
+    public Double getProductCost(@RequestBody OrderDto order) {
         return paymentService.getProductCost(order);
     }
 
     @Override
     @PostMapping("/failed")
-    public void paymentFailed(UUID orderId) {
+    public void paymentFailed(@RequestBody UUID orderId) {
         paymentService.paymentFailed(orderId);
     }
 }

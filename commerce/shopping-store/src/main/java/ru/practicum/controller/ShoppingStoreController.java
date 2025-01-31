@@ -24,33 +24,38 @@ public class ShoppingStoreController implements ShoppingStoreClient {
     }
 
     @Override
+    @GetMapping("/{productId}")
     public ProductDto getProduct(@PathVariable UUID productId) {
         return shoppingStoreService.getProductById(productId);
     }
 
     @Override
+    @PutMapping
     public ProductDto createNewProduct(@RequestBody ProductDto productDto) {
         return shoppingStoreService.addProduct(productDto);
     }
 
     @Override
+    @PostMapping
     public ProductDto updateProduct(@RequestBody ProductDto productDto) {
         return shoppingStoreService.updateProduct(productDto);
     }
 
     @Override
+    @PostMapping("/removeProductFromStore")
     public boolean removeProductFromStore(UUID productId) {
         return shoppingStoreService.deleteProduct(productId);
     }
 
     @Override
+    @PostMapping("/quantityState")
     public boolean setProductQuantityState(SetProductQuantityStateRequest request) {
         return shoppingStoreService.setQuantityState(request);
     }
 
     @Override
     @GetMapping("/onlyIds")
-    public List<ProductDto> getProductByIds(Collection<UUID> ids) {
+    public List<ProductDto> getProductByIds(@RequestParam Collection<UUID> ids) {
         return shoppingStoreService.getProductByIds(ids);
     }
 }

@@ -14,16 +14,16 @@ import java.util.UUID;
 @FeignClient(name = "warehouse")
 public interface WarehouseClient {
 
-    @PutMapping
+    @PutMapping("/api/v1/warehouse")
     void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest request);
 
     @PostMapping("/api/v1/warehouse/check")
     BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody ShoppingCartDto shoppingCartDto);
 
-    @PostMapping("/add")
+    @PostMapping("/api/v1/warehouse/add")
     void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);
 
-    @GetMapping("/address")
+    @GetMapping("/api/v1/warehouse/address")
     AddressDto getWarehouseAddress();
 
     @PostMapping("/api/v1/warehouse/shipped")

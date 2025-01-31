@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShoppingStoreServiceImpl implements ShoppingStoreService {
@@ -75,6 +77,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Override
     public List<ProductDto> getProductByIds(Collection<UUID> ids) {
+        log.info("==> ids for searching products: {}", ids);
         return productRepository.findAllById(ids)
                 .stream()
                 .map(productMapper::map)

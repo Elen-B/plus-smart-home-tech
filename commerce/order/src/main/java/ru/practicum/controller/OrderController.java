@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,12 @@ public class OrderController implements OrderClient {
     }
 
     @Override
+    @PostMapping("/payment/success")
+    public OrderDto successPayOrder(UUID orderId) {
+        return null;
+    }
+
+    @Override
     @PostMapping("/delivery")
     public OrderDto deliverOrder(UUID orderId) {
         return orderService.deliverOrder(orderId);
@@ -92,8 +99,8 @@ public class OrderController implements OrderClient {
     }
 
     @Override
-    @GetMapping("/{orderId}")
-    public OrderDto getOrder(@PathVariable(name = "orderId") UUID orderId) {
+    @GetMapping("/only")
+    public OrderDto getOrder(@RequestBody @NotNull UUID orderId) {
         return orderService.getOrderById(orderId);
     }
 }

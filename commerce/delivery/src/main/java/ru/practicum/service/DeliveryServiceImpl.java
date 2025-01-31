@@ -56,7 +56,6 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         ShippedToDeliveryRequest request = getNewShippedToDeliveryRequest(delivery);
         warehouseClient.shippedToDelivery(request);
-        orderClient.assemblyOrder(delivery.getOrderId());
     }
 
     @Override
@@ -71,6 +70,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Override
     public Double deliveryCost(OrderDto orderDto) {
         Delivery delivery = getDeliveryByOrderId(orderDto.getOrderId());
+        log.info("delivery for calc cost: {}", delivery);
         double cost = DeliveryUtil.BASE_DELIVERY_PRICE;
         cost += DeliveryUtil.BASE_DELIVERY_PRICE * getCoefByFromAddress(delivery.getFromAddress());
         cost *= getCoefByFragile(orderDto.isFragile());
@@ -121,14 +121,11 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private Delivery getNewDelivery(DeliveryDto deliveryDto) {
-        OrderDto orderDto = orderClient.getOrder(deliveryDto.getOrderId());
+        log.info("   ==> getNewDelivery for order id = {}", deliveryDto.getOrderId());
         return Delivery.builder()
                 .orderId(deliveryDto.getOrderId())
                 .fromAddress(addressMapper.map(deliveryDto.getFromAddress()))
                 .toAddress(addressMapper.map(deliveryDto.getToAddress()))
-                .deliveryWeight(orderDto.getDeliveryWeight())
-                .deliveryVolume(orderDto.getDeliveryVolume())
-                .fragile(orderDto.isFragile())
                 .deliveryState(DeliveryState.CREATED)
                 .build();
     }
