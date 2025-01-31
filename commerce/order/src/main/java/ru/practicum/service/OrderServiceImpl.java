@@ -52,7 +52,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto returnProducts(ProductReturnRequest request) {
-        return null;
+        warehouseClient.acceptReturn(request.getProducts());
+
+        return orderMapper.map(updateOrderState(request.getOrderId(), OrderState.PRODUCT_RETURNED));
     }
 
     @Override

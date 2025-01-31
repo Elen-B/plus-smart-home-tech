@@ -101,7 +101,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     @Transactional
     public void acceptReturn(Map<UUID, Integer> products) {
-
+        Map<UUID, WarehouseProduct> warehouseProducts = getWarehouseProducts(products.keySet());
+        for (Map.Entry<UUID, Integer> product : products.entrySet()) {
+            WarehouseProduct warehouseProduct = warehouseProducts.get(product.getKey());
+            warehouseProduct.setQuantity(warehouseProduct.getQuantity() + product.getValue());
+        }
+        saveWarehouseRemains(warehouseProducts.values());
     }
 
     @Override
