@@ -14,43 +14,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@FeignClient(name = "shopping-cart")
+@FeignClient(name = "shopping-cart", path = "/api/v1/shopping-cart")
 public interface ShoppingCartClient {
 
-    @GetMapping("/api/v1/shopping-cart")
+    @GetMapping
     ShoppingCartDto getShoppingCart(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
             String userName);
 
-    @PutMapping("/api/v1/shopping-cart")
+    @PutMapping
     ShoppingCartDto addProductsToShoppingCart(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
             String userName,
             @RequestBody Map<UUID, @NotNull Long> products);
 
-    @DeleteMapping("/api/v1/shopping-cart")
+    @DeleteMapping
     void deleteShoppingCart(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
             String userName);
 
-    @PostMapping("/api/v1/shopping-cart/remove")
+    @PostMapping("/remove")
     ShoppingCartDto removeFromShoppingCart(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
             String userName,
             @RequestBody List<UUID> products);
 
-    @PostMapping("/api/v1/shopping-cart/change-quantity")
+    @PostMapping("/change-quantity")
     ShoppingCartDto changeProductQuantity(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
             String userName,
             @RequestBody @Valid ChangeProductQuantityRequest request);
 
-    @PostMapping("/api/v1/shopping-cart/booking")
+    @PostMapping("/booking")
     BookedProductsDto bookingProductsFromShoppingCart(
             @RequestParam(name = "username")
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)

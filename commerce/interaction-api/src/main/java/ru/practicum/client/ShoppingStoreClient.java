@@ -13,27 +13,27 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "shopping-store")
+@FeignClient(name = "shopping-store", path = "/api/v1/shopping-store")
 public interface ShoppingStoreClient {
-    @GetMapping("/api/v1/shopping-store")
+    @GetMapping
     List<ProductDto> getProducts(@RequestParam(name = "category") @NotNull ProductCategory category,
                                  Pageable pageable);
 
-    @GetMapping("/api/v1/shopping-store/{productId}")
+    @GetMapping("/{productId}")
     ProductDto getProduct(@PathVariable UUID productId);
 
-    @PutMapping("/api/v1/shopping-store")
+    @PutMapping
     ProductDto createNewProduct(@RequestBody @Valid ProductDto productDto);
 
-    @PostMapping("/api/v1/shopping-store")
+    @PostMapping
     ProductDto updateProduct(@RequestBody @Valid ProductDto productDto);
 
-    @PostMapping("/api/v1/shopping-store/removeProductFromStore")
+    @PostMapping("/removeProductFromStore")
     boolean removeProductFromStore(@RequestBody UUID productId);
 
-    @PostMapping("/api/v1/shopping-store/quantityState")
+    @PostMapping("/quantityState")
     boolean setProductQuantityState(SetProductQuantityStateRequest request);
 
-    @GetMapping("/api/v1/shopping-store/onlyIds")
+    @GetMapping("/onlyIds")
     List<ProductDto> getProductByIds(@RequestParam Collection<UUID> ids);
 }

@@ -8,21 +8,21 @@ import ru.practicum.dto.PaymentDto;
 
 import java.util.UUID;
 
-@FeignClient(name = "payment")
+@FeignClient(name = "payment", path = "/api/v1/payment")
 public interface PaymentClient {
 
-    @PostMapping("/api/v1/payment")
+    @PostMapping
     PaymentDto createPayment(@RequestBody OrderDto order);
 
-    @PostMapping("/api/v1/payment/totalCost")
+    @PostMapping("/totalCost")
     Double getTotalCost(@RequestBody OrderDto order);
 
-    @PostMapping("/api/v1/payment/refund")
+    @PostMapping("/refund")
     void paymentSuccess(@RequestBody UUID orderId);
 
-    @PostMapping("/api/v1/payment/productCost")
+    @PostMapping("/productCost")
     Double getProductCost(@RequestBody OrderDto order);
 
-    @PostMapping("/api/v1/payment/failed")
+    @PostMapping("/failed")
     void paymentFailed(@RequestBody UUID orderId);
 }
