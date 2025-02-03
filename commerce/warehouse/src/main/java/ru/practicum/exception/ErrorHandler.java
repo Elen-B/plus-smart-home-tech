@@ -53,4 +53,19 @@ public class ErrorHandler {
                 e.getLocalizedMessage()
         );
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFoundException(
+            final NotFoundException e) {
+        return new ErrorResponse(
+                e.getCause(),
+                e.getStackTrace(),
+                HttpStatus.NOT_FOUND,
+                e.getMessage(),
+                e.getMessage(),
+                e.getSuppressed(),
+                e.getLocalizedMessage()
+        );
+    }
 }
