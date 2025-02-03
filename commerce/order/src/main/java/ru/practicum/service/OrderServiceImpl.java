@@ -4,13 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.client.DeliveryClient;
-import ru.practicum.client.PaymentClient;
-import ru.practicum.client.ShoppingCartClient;
-import ru.practicum.client.WarehouseClient;
 import ru.practicum.dto.*;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.mapper.OrderMapper;
 import ru.practicum.model.Order;
 import ru.practicum.repository.OrderRepository;
 
@@ -22,127 +17,110 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
-
-    private final ShoppingCartClient shoppingCartClient;
-    private final PaymentClient paymentClient;
-    private final DeliveryClient deliveryClient;
-    private final WarehouseClient warehouseClient;
 
     @Override
-    public List<OrderDto> getClientOrders(String userName) {
+    public List<Order> getClientOrders(String userName) {
         log.info("get orders for user {}", userName);
-        return orderRepository.findAllByUserName(userName)
-                .stream()
-                .map(orderMapper::map)
-                .toList();
+        return orderRepository.findAllByUserName(userName);
     }
 
     @Override
     @Transactional
-    public OrderDto createNewOrder(CreateNewOrderRequest request) {
-        Order order = getNewOrderFromRequest(request);
-        log.info("new order from request: {}", order);
-
-        Order savedOrder = orderRepository.save(order);
-        savedOrder = planDelivery(savedOrder.getOrderId(), request.getDeliveryAddress());
-        return orderMapper.map(savedOrder);
+    public Order createNewOrder(Order order) {
+        return orderRepository.save(order);
     }
 
     @Override
     @Transactional
-    public OrderDto returnProducts(ProductReturnRequest request) {
-        warehouseClient.acceptReturn(request.getProducts());
-
-        return orderMapper.map(updateOrderState(request.getOrderId(), OrderState.PRODUCT_RETURNED));
+    public Order returnProducts(UUID orderId) {
+        return updateOrderState(orderId, OrderState.PRODUCT_RETURNED);
     }
 
     @Override
     @Transactional
-    public OrderDto payOrder(UUID orderId) {
+    public Order successPayOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.PAID);
+    }
+
+    @Override
+    @Transactional
+    public Order failPayOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.PAYMENT_FAILED);
+    }
+
+    @Override
+    @Transactional
+    public Order setDelivery(UUID orderId, UUID deliveryId) {
         Order order = findOrderById(orderId);
-        double productCost = paymentClient.getProductCost(orderMapper.map(order));
-        double deliveryCost = deliveryClient.deliveryCost(orderMapper.map(order));
-        order.setDeliveryPrice(deliveryCost);
-        order.setProductPrice(productCost);
-        log.info("order after setting productPrice: {}", order);
-        double totalCost = paymentClient.getTotalCost(orderMapper.map(order));
+        order.setDeliveryId(deliveryId);
+
+        return orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public Order deliverOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.DELIVERED);
+    }
+
+    @Override
+    @Transactional
+    public Order failDeliverOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.DELIVERY_FAILED);
+    }
+
+    @Override
+    @Transactional
+    public Order completeOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.COMPLETED);
+    }
+
+    @Override
+    @Transactional
+    public Order setTotalPrice(UUID orderId, double totalCost) {
+        Order order = findOrderById(orderId);
         order.setTotalPrice(totalCost);
-        PaymentDto paymentDto = paymentClient.createPayment(orderMapper.map(order));
-        order.setPaymentId(paymentDto.getPaymentId());
-        order.setState(OrderState.ON_PAYMENT);
-        Order savedOrder = orderRepository.save(order);
-        log.info("payOrder: order after creating payment {}", savedOrder);
-        return orderMapper.map(savedOrder);
-    }
 
-    @Override
-    public OrderDto successPayOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.PAID));
+        return orderRepository.save(order);
     }
 
     @Override
     @Transactional
-    public OrderDto failPayOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.PAYMENT_FAILED));
-    }
-
-    @Override
-    public OrderDto deliverOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.DELIVERED));
-    }
-
-    @Override
-    @Transactional
-    public OrderDto failDeliverOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.DELIVERY_FAILED));
-    }
-
-    @Override
-    @Transactional
-    public OrderDto completeOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.COMPLETED));
-    }
-
-    @Override
-    public OrderDto calculateTotalPrice(UUID orderId) {
+    public Order setDeliveryPrice(UUID orderId, double deliveryCost) {
         Order order = findOrderById(orderId);
-        double totalCost = paymentClient.getTotalCost(orderMapper.map(order));
-        order.setTotalPrice(totalCost);
-        Order savedOrder = orderRepository.save(order);
-
-        return orderMapper.map(savedOrder);
-    }
-
-    @Override
-    @Transactional
-    public OrderDto calculateDeliveryPrice(UUID orderId) {
-        Order order = findOrderById(orderId);
-        double deliveryCost = deliveryClient.deliveryCost(orderMapper.map(order));
         order.setDeliveryPrice(deliveryCost);
-        Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.map(savedOrder);
+        return orderRepository.save(order);
     }
 
     @Override
     @Transactional
-    public OrderDto assemblyOrder(UUID orderId) {
-        warehouseClient.assemblyProductsForOrder(getNewAssemblyProductsForOrderRequest(orderId));
-
-        return orderMapper.map(updateOrderState(orderId, OrderState.ASSEMBLED));
+    public Order assemblyOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.ASSEMBLED);
     }
 
     @Override
     @Transactional
-    public OrderDto failAssemblyOrder(UUID orderId) {
-        return orderMapper.map(updateOrderState(orderId, OrderState.ASSEMBLY_FAILED));
+    public Order failAssemblyOrder(UUID orderId) {
+        return updateOrderState(orderId, OrderState.ASSEMBLY_FAILED);
     }
 
     @Override
-    public OrderDto getOrderById(UUID orderId) {
+    public Order getOrderById(UUID orderId) {
         log.info("==> get order by id = {}", orderId);
-        return orderMapper.map(findOrderById(orderId));
+        return findOrderById(orderId);
+    }
+
+    @Override
+    @Transactional
+    public Order savePaymentInfo(Order order) {
+        Order oldOrder = findOrderById(order.getOrderId());
+        oldOrder.setProductPrice(order.getProductPrice());
+        oldOrder.setDeliveryPrice(order.getDeliveryPrice());
+        oldOrder.setTotalPrice(order.getTotalPrice());
+        oldOrder.setPaymentId(order.getPaymentId());
+        oldOrder.setState(OrderState.ON_PAYMENT);
+        return orderRepository.save(order);
     }
 
     private Order updateOrderState(UUID orderId, OrderState newState) {
@@ -151,56 +129,9 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    private Order getOrderByUserName(String userName) {
-        return orderRepository.findByUserName(userName).orElseThrow(
-                () -> new NotFoundException("Заказ покупателя не найден")
-        );
-    }
-
     private Order findOrderById(UUID orderId) {
         return orderRepository.findById(orderId).orElseThrow(
                 () -> new NotFoundException("Заказ покупателя не найден")
         );
-    }
-
-    private Order getNewOrderFromRequest(CreateNewOrderRequest request) {
-        BookedProductsDto bookedProductsDto = shoppingCartClient.bookingProductsFromShoppingCart(request.getUserName());
-
-        return Order.builder()
-                .userName(request.getUserName())
-                .cartId(request.getShoppingCart().getShoppingCartId())
-                .products(request.getShoppingCart().getProducts())
-                .deliveryWeight(bookedProductsDto.getDeliveryWeight())
-                .deliveryVolume(bookedProductsDto.getDeliveryVolume())
-                .fragile(bookedProductsDto.getFragile())
-                .state(OrderState.NEW)
-                .build();
-    }
-
-    private UUID getNewDeliveryId(UUID orderId, AddressDto deliveryAddress) {
-        DeliveryDto deliveryDto = new DeliveryDto();
-        deliveryDto.setFromAddress(warehouseClient.getWarehouseAddress());
-        deliveryDto.setToAddress(deliveryAddress);
-        deliveryDto.setOrderId(orderId);
-        deliveryDto.setDeliveryState(DeliveryState.CREATED);
-        log.info("new DeliveryDto: {}", deliveryDto);
-
-        return deliveryClient.planDelivery(deliveryDto).getDeliveryId();
-    }
-
-    private Order planDelivery(UUID orderId, AddressDto deliveryAddress) {
-        Order order = findOrderById(orderId);
-        order.setDeliveryId(getNewDeliveryId(orderId, deliveryAddress));
-
-        return orderRepository.save(order);
-    }
-
-    private AssemblyProductsForOrderRequest getNewAssemblyProductsForOrderRequest(UUID orderId) {
-        Order order = findOrderById(orderId);
-        AssemblyProductsForOrderRequest request = new AssemblyProductsForOrderRequest();
-        request.setOrderId(orderId);
-        request.setProducts(order.getProducts());
-
-        return request;
     }
 }

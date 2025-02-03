@@ -1,39 +1,39 @@
 package ru.practicum.service;
 
-import ru.practicum.dto.CreateNewOrderRequest;
-import ru.practicum.dto.OrderDto;
-import ru.practicum.dto.ProductReturnRequest;
+import ru.practicum.model.Order;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
 
-    List<OrderDto> getClientOrders(String userName);
+    List<Order> getClientOrders(String userName);
 
-    OrderDto createNewOrder(CreateNewOrderRequest request);
+    Order createNewOrder(Order order);
 
-    OrderDto returnProducts(ProductReturnRequest request);
+    Order returnProducts(UUID orderId);
 
-    OrderDto payOrder(UUID orderId);
+    Order successPayOrder(UUID orderId);
 
-    OrderDto successPayOrder(UUID orderId);
+    Order failPayOrder(UUID orderId);
 
-    OrderDto failPayOrder(UUID orderId);
+    Order setDelivery(UUID orderId, UUID deliveryId);
 
-    OrderDto deliverOrder(UUID orderId);
+    Order deliverOrder(UUID orderId);
 
-    OrderDto failDeliverOrder(UUID orderId);
+    Order failDeliverOrder(UUID orderId);
 
-    OrderDto completeOrder(UUID orderId);
+    Order completeOrder(UUID orderId);
 
-    OrderDto calculateTotalPrice(UUID orderId);
+    Order setTotalPrice(UUID orderId, double totalCost);
 
-    OrderDto calculateDeliveryPrice(UUID orderId);
+    Order setDeliveryPrice(UUID orderId, double deliveryCost);
 
-    OrderDto assemblyOrder(UUID orderId);
+    Order assemblyOrder(UUID orderId);
 
-    OrderDto failAssemblyOrder(UUID orderId);
+    Order failAssemblyOrder(UUID orderId);
 
-    OrderDto getOrderById(UUID orderId);
+    Order getOrderById(UUID orderId);
+
+    Order savePaymentInfo(Order order);
 }
