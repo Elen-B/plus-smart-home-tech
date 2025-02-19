@@ -9,10 +9,11 @@ import ru.practicum.dto.ProductCategory;
 import ru.practicum.dto.ProductDto;
 import ru.practicum.dto.SetProductQuantityStateRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "shopping-store")
+@FeignClient(name = "shopping-store", path = "/api/v1/shopping-store")
 public interface ShoppingStoreClient {
     @GetMapping
     List<ProductDto> getProducts(@RequestParam(name = "category") @NotNull ProductCategory category,
@@ -32,4 +33,7 @@ public interface ShoppingStoreClient {
 
     @PostMapping("/quantityState")
     boolean setProductQuantityState(SetProductQuantityStateRequest request);
+
+    @GetMapping("/onlyIds")
+    List<ProductDto> getProductByIds(@RequestParam Collection<UUID> ids);
 }

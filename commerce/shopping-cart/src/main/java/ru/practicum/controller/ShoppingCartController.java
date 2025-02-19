@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.ShoppingCartClient;
 import ru.practicum.dto.BookedProductsDto;
 import ru.practicum.dto.ChangeProductQuantityRequest;
@@ -26,12 +25,14 @@ public class ShoppingCartController implements ShoppingCartClient {
     private final ShoppingCartService shoppingCartService;
 
     @Override
+    @GetMapping
     public ShoppingCartDto getShoppingCart(
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE) String userName) {
         return shoppingCartService.getShoppingCart(userName);
     }
 
     @Override
+    @PutMapping
     public ShoppingCartDto addProductsToShoppingCart(
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE) String userName,
             Map<UUID, @NotNull Long> products) {
@@ -39,11 +40,13 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
+    @DeleteMapping
     public void deleteShoppingCart(@NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE) String userName) {
         shoppingCartService.deleteShoppingCart(userName);
     }
 
     @Override
+    @PostMapping("/remove")
     public ShoppingCartDto removeFromShoppingCart(@NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
                                                       String userName,
                                                   List<UUID> products) {
@@ -51,6 +54,7 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
+    @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantity(@NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE)
                                                      String userName,
                                                  @Valid ChangeProductQuantityRequest request) {
@@ -58,6 +62,7 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
+    @PostMapping("/booking")
     public BookedProductsDto bookingProductsFromShoppingCart(
             @NotBlank(message = ValidationUtil.VALIDATION_USERNAME_MESSAGE) String userName) {
         return shoppingCartService.bookingProductsFromShoppingCart(userName);

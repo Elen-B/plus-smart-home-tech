@@ -5,6 +5,7 @@ import ru.practicum.dto.ProductCategory;
 import ru.practicum.dto.ProductDto;
 import ru.practicum.dto.SetProductQuantityStateRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,4 +22,6 @@ public interface ShoppingStoreService {
     boolean setQuantityState(SetProductQuantityStateRequest stateRequest);
 
     boolean deleteProduct(UUID productId);
+
+    List<ProductDto> getProductByIds(Collection<UUID> ids);
 }
